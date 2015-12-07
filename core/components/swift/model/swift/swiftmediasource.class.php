@@ -143,7 +143,8 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
                 $directories[$currentPath] = array(
                     'id' => $currentPath.'/',
                     'text' => $fileName,
-                    'cls' => 'icon-'.$extension,
+                    //'cls' => 'icon-file icon-folder',
+                    'iconCls' => 'icon icon-folder',
                     'type' => 'dir',
                     'leaf' => false,
                     'path' => $currentPath,
@@ -155,7 +156,8 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
                 $files[$currentPath] = array(
                     'id' => $currentPath,
                     'text' => $fileName,
-                    'cls' => 'icon-'.$extension,
+                    //'cls' => 'icon-file icon-'.$extension,
+                    'iconCls' => 'icon icon-file icon-'.$extension,
                     'type' => 'file',
                     'leaf' => true,
                     'path' => $currentPath,
@@ -998,7 +1000,8 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
      */
     public function getObjectUrl($object = '') {
         $properties = $this->getPropertyList();
-        return $properties['url'].$object;
+
+        return $properties['url'] . str_replace($properties['url'], '', $object);
     }
 
 
