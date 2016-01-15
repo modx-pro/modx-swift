@@ -1012,7 +1012,6 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
      * @return array
      */
     public function getObjectContents($objectPath) {
-        $properties = $this->getPropertyList();
         try {
             $obj = new CF_Object($this->container,$objectPath, true);
             $contents = $obj->read();
@@ -1020,6 +1019,7 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
             $size = $obj->content_length;
         }
         catch (Exception $e) {
+            $this->xpdo->log(modX::LOG_LEVEL_ERROR,'[SwiftMediaSource] Could not get object contents: '.$e->getMessage());
             $contents = '';
             $last_modified = '';
             $size = '';
