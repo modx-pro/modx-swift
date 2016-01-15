@@ -1,26 +1,31 @@
 Changelog for OpenStack Swift.
 
+1.1.0-pl (15.01.2016)
+===============================
+- Updated core to the latest Rackspace OpenCloud API.
+- Total refactor of component.
+
 1.0.2-pl (7.12.2015)
 ===============================
-* Fixed folder and file icons for Revolution 2.3+
-* Improved method getObjectUrl.
+- Fixed folder and file icons for Revolution 2.3+
+- Improved method getObjectUrl.
 
 1.0.1-pl (11.04.2015)
 ===============================
-* Some fixes in PHP Cloud Files API
+- Some fixes in PHP Cloud Files API
 
 1.0.0-pl (22.12.2012)
 ===============================
 
-* Use CF_Object in getObjectContents instead file_get_contents
-* Add support create and edit files
-* Fix upload files and create folders in root
+- Use CF_Object in getObjectContents instead file_get_contents
+- Add support create and edit files
+- Fix upload files and create folders in root
 
 
 1.0.0 beta 2 (14.10.2012)
 ===============================
-* Fix filepath in upload method
+- Fix filepath in upload method
 
 1.0.0 beta 1 (04.10.2012)
 ===============================
-* Initial release
+- Initial release
