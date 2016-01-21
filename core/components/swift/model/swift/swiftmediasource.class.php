@@ -108,7 +108,7 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
         $files = array();
         /** @var OpenCloud\ObjectStore\Resource\DataObject $obj */
         foreach ($list as $idx => $obj) {
-            $currentPath = rawurldecode($obj->getName());
+            $currentPath = rtrim(rawurldecode($obj->getName()), DIRECTORY_SEPARATOR);
             $fileName = $this->getBasename($currentPath);
             $contentType = $obj->getContentType();
 
@@ -295,7 +295,7 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
         $files = array();
         /** @var OpenCloud\ObjectStore\Resource\DataObject $obj */
         foreach ($list as $obj) {
-            $name = rawurldecode($obj->getName());
+            $name = rtrim(rawurldecode($obj->getName()), DIRECTORY_SEPARATOR);
             $baseName = $this->getBasename($name);
             $contentType = $obj->getContentType();
             $objectUrl = $containerUrl . trim($name, '/');
@@ -958,7 +958,9 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
      */
     protected function getBasename($path)
     {
-        return array_pop(explode(DIRECTORY_SEPARATOR, $path));
+        $tmp = explode(DIRECTORY_SEPARATOR, rtrim($path, DIRECTORY_SEPARATOR));
+
+        return array_pop($tmp);
     }
 
 }

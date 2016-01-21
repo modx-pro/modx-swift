@@ -1,5 +1,10 @@
 Changelog for OpenStack Swift.
 
+1.1.1-pl (21.01.2016)
+===============================
+- Fixed "strict standards" PHP warning.
+- Fixed possible containers duplication in a menus.
+
 1.1.0-pl (15.01.2016)
 ===============================
 - Updated core to the latest Rackspace OpenCloud API.
