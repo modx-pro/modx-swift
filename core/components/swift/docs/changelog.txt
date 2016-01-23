@@ -1,5 +1,9 @@
 Changelog for OpenStack Swift.
 
+1.1.2-pl (24.01.2016)
+===============================
+- Improved remove of directories.
+
 1.1.1-pl (21.01.2016)
 ===============================
 - Fixed "strict standards" PHP warning.

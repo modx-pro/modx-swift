@@ -475,10 +475,16 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
     public function removeContainer($path)
     {
         try {
-            if ($object = $this->container->getPartialObject(rawurlencode($path))) {
-                if ($object->delete()) {
-                    $this->xpdo->logManagerAction('directory_remove', '', $path);
+            if ($list = $this->container->objectList(array('path' => $path))) {
+                /** @var OpenCloud\ObjectStore\Resource\DataObject $object */
+                foreach ($list as $idx => $object) {
+                    $name = rawurldecode($object->getName());
+                    if ($object->getContentType() == 'application/directory') {
+                        $this->removeContainer($name);
+                    }
+                    $this->removeObject($name);
                 }
+                $this->removeObject($path);
 
                 return true;
             } else {
