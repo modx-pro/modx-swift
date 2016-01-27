@@ -482,7 +482,9 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
                     if ($object->getContentType() == 'application/directory') {
                         $this->removeContainer($name);
                     }
-                    $this->removeObject($name);
+                    else {
+                        $this->removeObject($name);
+                    }
                 }
                 $this->removeObject($path);
 
