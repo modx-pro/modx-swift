@@ -5,4 +5,8 @@ $xpdo_meta_map = array (
   array (
     0 => 'SwiftMediaSource',
   ),
+  'SwiftMediaSource' => 
+  array (
+    0 => 'RackspaceMediaSource',
+  ),
 );

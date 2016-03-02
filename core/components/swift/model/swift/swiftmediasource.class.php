@@ -4,13 +4,6 @@ if (!class_exists('modMediaSource')) {
     require MODX_CORE_PATH . 'model/modx/sources/modmediasource.class.php';
 }
 
-/**
- * Implements an OpenStack Object Storage (Swift) media source, allowing basic manipulation, uploading and URL-retrieval of resources
- * in a specified Swift container.
- *
- * @package modx
- * @subpackage sources
- */
 class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
 {
     /** @var \OpenCloud\ObjectStore\Service $service */
@@ -19,6 +12,11 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
     public $container;
 
 
+    /**
+     * SwiftMediaSource constructor.
+     *
+     * @param xPDO $xpdo
+     */
     public function __construct(xPDO & $xpdo)
     {
         parent::__construct($xpdo);
@@ -41,25 +39,33 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
             require dirname(dirname(dirname(__FILE__))) . '/vendor/autoload.php';
         }
 
+        return $this->initializeService();
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function initializeService()
+    {
         try {
-            $client = new OpenCloud\OpenStack(
-                trim($this->xpdo->getOption('authentication_service', $this->properties, '')),
-                array(
-                    'username' => trim($this->xpdo->getOption('username', $this->properties, '')),
-                    'password' => trim($this->xpdo->getOption('api_key', $this->properties, '')),
-                )
-            );
+            $endpoint = $this->xpdo->getOption('authentication_service', $this->properties, '');
+            $client = new OpenCloud\OpenStack(trim($endpoint), array(
+                'username' => trim($this->xpdo->getOption('username', $this->properties, '')),
+                'password' => trim($this->xpdo->getOption('api_key', $this->properties, '')),
+            ));
             $this->service = $client->objectStoreService('swift', 'Common');
             $this->container = $this->service->getContainer(array(
                 'name' => $this->xpdo->getOption('container', $this->properties, ''),
             ));
+
+            return true;
         } catch (Exception $e) {
-            $this->xpdo->log(modX::LOG_LEVEL_ERROR, '[SwiftMediaSource] Could not authenticate: ' . $e->getMessage());
+            $this->xpdo->log(modX::LOG_LEVEL_ERROR,
+                '[SwiftMediaSource] Could not authenticate: ' . $e->getMessage());
 
             return false;
         }
-
-        return true;
     }
 
 
@@ -481,8 +487,7 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
                     $name = rawurldecode($object->getName());
                     if ($object->getContentType() == 'application/directory') {
                         $this->removeContainer($name);
-                    }
-                    else {
+                    } else {
                         $this->removeObject($name);
                     }
                 }

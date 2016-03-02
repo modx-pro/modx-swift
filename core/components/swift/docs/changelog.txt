@@ -1,5 +1,9 @@
 Changelog for OpenStack Swift.
 
+1.2.0-pl (02.03.2016)
+===============================
+- Additional media source for Rackspace.
+
 1.1.2-pl (24.01.2016)
 ===============================
 - Improved remove of directories.
