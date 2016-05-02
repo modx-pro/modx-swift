@@ -102,6 +102,8 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
     {
         $useMultiByte = $this->xpdo->getOption('use_multibyte', false);
         $encoding = $this->xpdo->getOption('modx_charset', 'UTF-8');
+        $hideTooltips = !empty($properties['hideTooltips']) && $properties['hideTooltips'] != 'false';
+        $images = array_map('trim', explode(',', $this->getOption('imageExtensions', $properties, 'jpg,jpeg,png,gif')));
 
         $path = !empty($path)
             ? ltrim($path, '/')
@@ -155,6 +157,11 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
                 $files[$currentPath]['menu'] = array(
                     'items' => $this->getListContextMenu(false, stripos($contentType, 'text') !== 0),
                 );
+                if (!$hideTooltips) {
+                    $files[$currentPath]['qtip'] = in_array($extension, $images)
+                        ? '<img src="' . $files[$currentPath]['url'] . '" alt="' . $fileName . '" />'
+                        : '';
+                }
             }
         }
         $ls = array();
@@ -281,16 +288,18 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
         $containerUrl = rtrim($this->properties['url'], '/') . '/';
         $allowedFileTypes = $this->getOption('allowedFileTypes', $this->properties, '');
         $allowedFileTypes = !empty($allowedFileTypes) && is_string($allowedFileTypes)
-            ? explode(',', $allowedFileTypes)
+            ? array_map('trim', explode(',', $allowedFileTypes))
             : $allowedFileTypes;
         $imageExtensions = $this->getOption('imageExtensions', $this->properties, 'jpg,jpeg,png,gif');
-        $imageExtensions = explode(',', $imageExtensions);
+        $imageExtensions = array_map('trim', explode(',', $imageExtensions));
         $thumbnailType = $this->getOption('thumbnailType', $this->properties, 'png');
         $thumbnailQuality = $this->getOption('thumbnailQuality', $this->properties, 90);
         $skipFiles = $this->getOption('skipFiles', $this->properties, '.svn,.git,_notes,.DS_Store');
-        $skipFiles = explode(',', $skipFiles);
+        $skipFiles = array_map('trim', explode(',', $skipFiles));
         $skipFiles[] = '.';
         $skipFiles[] = '..';
+        $thumbWidth = $this->ctx->getOption('filemanager_thumb_width', 100);
+        $thumbHeight = $this->ctx->getOption('filemanager_thumb_height', 80);
 
         $path = !empty($path)
             ? ltrim($path, '/')
@@ -317,6 +326,7 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
                     'url' => $objectUrl,
                     'relativeUrl' => $objectUrl,
                     'fullRelativeUrl' => $objectUrl,
+                    'pathRelative' => $name,
                     'pathname' => $objectUrl,
                     'size' => $obj->getContentLength(),
                     'leaf' => true,
@@ -337,55 +347,25 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
 
                 // get thumbnail
                 if (in_array($fileArray['ext'], $imageExtensions)) {
-                    $imageWidth = $this->xpdo->getOption('filemanager_image_width', 400);
-                    $imageHeight = $this->xpdo->getOption('filemanager_image_height', 300);
-                    $thumbHeight = $this->xpdo->getOption('filemanager_thumb_height', 60);
-                    $thumbWidth = $this->xpdo->getOption('filemanager_thumb_width', 80);
+                    $fileArray['preview'] = 1;
+                    $fileArray['image'] = $objectUrl;
 
-                    $size = @getimagesize($objectUrl);
-                    if (is_array($size)) {
-                        $imageWidth = $size[0] > 800 ? 800 : $size[0];
-                        $imageHeight = $size[1] > 600 ? 600 : $size[1];
-                    }
-
-                    // ensure max h/w
-                    if ($thumbWidth > $imageWidth) {
-                        $thumbWidth = $imageWidth;
-                    }
-                    if ($thumbHeight > $imageHeight) {
-                        $thumbHeight = $imageHeight;
-                    }
-
-                    // generate thumb/image URLs
                     $thumbQuery = http_build_query(array(
-                        'src' => $name,
+                        'src' => $objectUrl,
                         'w' => $thumbWidth,
                         'h' => $thumbHeight,
                         'f' => $thumbnailType,
                         'q' => $thumbnailQuality,
+                        'far' => 1,
                         'HTTP_MODAUTH' => $modAuth,
                         'wctx' => $this->xpdo->context->get('key'),
                         'source' => $this->get('id'),
                     ));
-                    $imageQuery = http_build_query(array(
-                        'src' => $name,
-                        'w' => $imageWidth,
-                        'h' => $imageHeight,
-                        'HTTP_MODAUTH' => $modAuth,
-                        'f' => $thumbnailType,
-                        'q' => $thumbnailQuality,
-                        'wctx' => $this->xpdo->context->get('key'),
-                        'source' => $this->get('id'),
-                    ));
-                    $fileArray['thumb'] = $this->xpdo->getOption('connectors_url',
-                            MODX_CONNECTORS_URL) . 'system/phpthumb.php?' . urldecode($thumbQuery);
-                    $fileArray['image'] = $this->xpdo->getOption('connectors_url',
-                            MODX_CONNECTORS_URL) . 'system/phpthumb.php?' . urldecode($imageQuery);
+                    $fileArray['thumb'] = $this->xpdo->getOption('connectors_url', MODX_CONNECTORS_URL) .
+                        'system/phpthumb.php?' . urldecode($thumbQuery);
                 } else {
-                    $fileArray['thumb'] = $this->xpdo->getOption('manager_url',
-                            MODX_MANAGER_URL) . 'templates/default/images/restyle/nopreview.jpg';
-                    $fileArray['thumbWidth'] = $this->xpdo->getOption('filemanager_thumb_width', 80);
-                    $fileArray['thumbHeight'] = $this->xpdo->getOption('filemanager_thumb_height', 60);
+                    $fileArray['thumb'] = $this->xpdo->getOption('manager_url', MODX_MANAGER_URL) .
+                        'templates/default/images/restyle/nopreview.jpg';
                 }
                 $files[] = $fileArray;
             }
@@ -911,7 +891,7 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
      */
     public function prepareSrcForThumb($src)
     {
-        return $this->getObjectUrl();
+        return $this->getObjectUrl($src);
     }
 
 
@@ -935,7 +915,9 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
      */
     public function getObjectUrl($object = '')
     {
-        return $this->properties['url'] . str_replace($this->properties['url'], '', $object);
+        $url = trim($this->properties['url'], '/');
+
+        return $url . '/' . str_replace($url, '', ltrim($object, '/'));
     }
 
 
