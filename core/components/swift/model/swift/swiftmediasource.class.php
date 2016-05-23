@@ -917,7 +917,7 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
     {
         $url = trim($this->properties['url'], '/');
 
-        return $url . '/' . str_replace($url, '', ltrim($object, '/'));
+        return $url . '/' . ltrim(str_replace($url, '', $object), '/');
     }
 
 

@@ -1,5 +1,9 @@
 Changelog for OpenStack Swift.
 
+1.2.2-pl (23.05.2016)
+===============================
+- Fixed getObjectUrl method.
+
 1.2.1-pl (02.05.2016)
 ===============================
 - [#2] Improved compatibility with MODX media browser.
