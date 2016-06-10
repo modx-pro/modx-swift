@@ -54,7 +54,7 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
                 'username' => trim($this->xpdo->getOption('username', $this->properties, '')),
                 'password' => trim($this->xpdo->getOption('api_key', $this->properties, '')),
             ));
-            $this->service = $client->objectStoreService('swift', 'Common');
+            $this->service = $client->objectStoreService('swift', 'common');
             $this->container = $this->service->getContainer(array(
                 'name' => $this->xpdo->getOption('container', $this->properties, ''),
             ));

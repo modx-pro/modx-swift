@@ -1,5 +1,10 @@
 Changelog for OpenStack Swift.
 
+1.2.3-pl (10.06.2016)
+===============================
+- [SwiftMediaSource] Changed endpoint from "Common" to "common" due to Selectel update.
+- Updated rackspace/php-opencloud to version 1.16.0.
+
 1.2.2-pl (23.05.2016)
 ===============================
 - Fixed getObjectUrl method.
