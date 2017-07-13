@@ -1,5 +1,9 @@
 Changelog for OpenStack Swift.
 
+1.2.4-pl (13.07.2017)
+===============================
+- Improved listing of files in the manager tree.
+
 1.2.3-pl (10.06.2016)
 ===============================
 - [SwiftMediaSource] Changed endpoint from "Common" to "common" due to Selectel update.

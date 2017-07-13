@@ -119,6 +119,16 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
             $currentPath = rtrim(rawurldecode($obj->getName()), DIRECTORY_SEPARATOR);
             $fileName = $this->getBasename($currentPath);
             $contentType = $obj->getContentType();
+            // Workaround for display directories
+            if (empty($path) && $currentPath != $fileName) {
+                if (strpos($currentPath, DIRECTORY_SEPARATOR)) {
+                    $tmp = explode(DIRECTORY_SEPARATOR, $currentPath);
+                    $fileName = $currentPath = $tmp[0];
+                    $contentType = 'application/directory';
+                } else {
+                    continue;
+                }
+            }
 
             if (strtolower($contentType) == 'application/directory') {
                 $directories[$currentPath] = array(
