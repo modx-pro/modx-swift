@@ -26,6 +26,7 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
 
     /**
      * Initializes Swift media class, connect and get container
+     *
      * @return boolean
      */
     public function initialize()
@@ -48,16 +49,65 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
      */
     public function initializeService()
     {
+        /** @var xPDOCacheManager $cacheManager */
+        $cacheManager = $this->xpdo->getCacheManager();
+        $key = 'sources/swift-' . $this->get('id');
         try {
-            $endpoint = $this->xpdo->getOption('authentication_service', $this->properties, '');
-            $client = new OpenCloud\OpenStack(trim($endpoint), array(
+            $endpoint = trim($this->xpdo->getOption('authentication_service', $this->properties, ''));
+            $client = new OpenCloud\OpenStack($endpoint, array(
                 'username' => trim($this->xpdo->getOption('username', $this->properties, '')),
                 'password' => trim($this->xpdo->getOption('api_key', $this->properties, '')),
             ));
+
+            if ($data = json_decode($cacheManager->get($key))) {
+                if (strtotime($data->token->expires) > time()) {
+                    $identity = OpenCloud\Identity\Service::factory($client);
+                    $client->setCatalog($data->catalog);
+                    $client->setUser($identity->resource('User', $data->user));
+                    $client->setTokenObject($identity->resource('Token', $data->token));
+                    if (isset($data->token->tenant)) {
+                        $client->setTenantObject($identity->resource('Tenant', $data->token->tenant));
+                    }
+                    $client->setDefaultOption('headers/X-Auth-Token', (string)$data->token->id);
+                }
+            }
+
             $this->service = $client->objectStoreService('swift', 'common');
             $this->container = $this->service->getContainer(array(
                 'name' => $this->xpdo->getOption('container', $this->properties, ''),
             ));
+
+            if (!$data && $user = $client->getUser()) {
+                $data = array(
+                    'user' => array(
+                        'id' => $user->getId(),
+                        'name' => $user->getUsername(),
+                        'roles' => array(),
+                    ),
+                    'token' => array(
+                        'id' => $client->getToken(),
+                        'expires' => $client->getExpiration(),
+                        'tenant' => array(
+                            'id' => $client->getTenant(),
+                            'name' => $client->getTenant(),
+                        ),
+                    ),
+                );
+
+                /** @var OpenCloud\Common\Service\Catalog $catalogs */
+                $catalogs = $client->getCatalog();
+                /** @var OpenCloud\Common\Service\CatalogItem $item */
+                $data['catalog'] = array();
+                foreach ($catalogs->getItems() as $k => $item) {
+                    $data['catalog'][] = array(
+                        'endpoints' => $item->getEndpoints(),
+                        'type' => $item->getType(),
+                        'name' => $item->getName(),
+                    );
+                }
+
+                $cacheManager->set($key, json_encode($data), strtotime($data['token']['expires']) - time());
+            }
 
             return true;
         } catch (Exception $e) {
@@ -71,6 +121,7 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
 
     /**
      * Get the name of this source type
+     *
      * @return string
      */
     public function getTypeName()
@@ -83,6 +134,7 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
 
     /**
      * Get the description of this source type
+     *
      * @return string
      */
     public function getTypeDescription()
@@ -682,10 +734,11 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
      * @param string $from The location to move from
      * @param string $to The location to move to
      * @param string $point
+     * @param int $to_source
      *
      * @return boolean
      */
-    public function moveObject($from, $to, $point = 'append')
+    public function moveObject($from, $to, $point = 'append', $to_source = 0)
     {
         if (substr($from, -1) == '/') {
             $this->xpdo->error->message = $this->xpdo->lexicon('s3_no_move_folder', array(
