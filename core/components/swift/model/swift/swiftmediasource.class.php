@@ -72,7 +72,7 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
                 }
             }
 
-            $this->service = $client->objectStoreService('swift', 'common');
+            $this->service = $client->objectStoreService('swift', $this->xpdo->getOption('service', $this->properties, 'ru-1', true));
             $this->container = $this->service->getContainer(array(
                 'name' => $this->xpdo->getOption('container', $this->properties, ''),
             ));
@@ -878,6 +878,14 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
                 'type' => 'textfield',
                 'options' => '',
                 'value' => '',
+                'lexicon' => 'swift:default',
+            ),
+            'service' => array(
+                'name' => 'service',
+                'desc' => 'prop_swift.service_desc',
+                'type' => 'textfield',
+                'options' => '',
+                'value' => 'ru-1',
                 'lexicon' => 'swift:default',
             ),
             'authentication_service' => array(

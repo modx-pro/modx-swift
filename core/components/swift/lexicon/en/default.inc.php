@@ -11,6 +11,7 @@ $_lang['prop_swift.imageExtensions_desc'] = 'A comma-separated list of file exte
 $_lang['prop_swift.thumbnailType_desc'] = 'The image type to render thumbnails as.';
 $_lang['prop_swift.thumbnailQuality_desc'] = 'The quality of the rendered thumbnails, in a scale from 0-100.';
 $_lang['prop_swift.skipFiles_desc'] = 'A comma-separated list. MODX will skip over and hide files and folders that match any of these.';
+$_lang['prop_swift.service_desc'] = 'Object store service to initialize';
 
 $_lang['source_type.rackspace'] = 'Rackspace Object Storage';
 $_lang['source_type.rackspace_desc'] = 'Navigates an Rackspace Object Storage container (Swift).';

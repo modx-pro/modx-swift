@@ -11,6 +11,7 @@ $_lang['prop_swift.imageExtensions_desc'] = 'Список расширений �
 $_lang['prop_swift.thumbnailType_desc'] = 'Тип изображения, используемый для создаваемых превью.';
 $_lang['prop_swift.thumbnailQuality_desc'] = 'Качество генерируемых превью, по шкале от 0 до 100.';
 $_lang['prop_swift.skipFiles_desc'] = 'Список, через запятую. MODx будет пропускать и скрывать файлы и папки, совпадающие с любой из масок.';
+$_lang['prop_swift.service_desc'] = 'Имя службы хранилища для инициализации';
 
 $_lang['source_type.rackspace'] = 'Rackspace Object Storage';
 $_lang['source_type.rackspace_desc'] = 'Использует хранилище Rackspace Object Storage container (Swift).';
