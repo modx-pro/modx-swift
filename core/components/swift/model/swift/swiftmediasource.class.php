@@ -211,6 +211,7 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
                     'leaf' => true,
                     'path' => $currentPath,
                     'pathRelative' => $currentPath,
+                    'lastmod' => (int)strtotime($obj->getLastModified()),
                     'directory' => $currentPath,
                     'url' => rtrim($this->properties['url'], '/') . '/' . $currentPath,
                     'file' => $currentPath,
@@ -390,6 +391,7 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
                     'fullRelativeUrl' => $objectUrl,
                     'pathRelative' => $name,
                     'pathname' => $objectUrl,
+                    'lastmod' => (int)strtotime($obj->getLastModified()),
                     'size' => $obj->getContentLength(),
                     'leaf' => true,
                     'menu' => array(
