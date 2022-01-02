@@ -360,8 +360,8 @@ class SwiftMediaSource extends modMediaSource implements modMediaSourceInterface
         $skipFiles = array_map('trim', explode(',', $skipFiles));
         $skipFiles[] = '.';
         $skipFiles[] = '..';
-        $thumbWidth = $this->ctx->getOption('filemanager_thumb_width', 100);
-        $thumbHeight = $this->ctx->getOption('filemanager_thumb_height', 80);
+        $thumbWidth = $this->getWorkingContext()->getOption('filemanager_thumb_width', 100);
+        $thumbHeight = $this->getWorkingContext()->getOption('filemanager_thumb_height', 80);
 
         $path = !empty($path)
             ? ltrim($path, '/')
